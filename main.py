@@ -96,7 +96,6 @@ if st.session_state.diary_generated == False:
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="button-group">', unsafe_allow_html=True)
-    audio_submitter = st.button('Submit your audio!')
     st.markdown('</div>', unsafe_allow_html=True)
 
     if audio_bytes and audio_submitter and not st.session_state.audio_processing:
