@@ -1,0 +1,122 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #e0f7fa;
+    color: #333;
+}
+
+.stButton button {
+    background-color: #0277bd;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    margin: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.stButton button:hover {
+    background-color: #01579b;
+    transform: scale(1.05);
+}
+
+.stAudio audio {
+    width: 100%;
+    margin: 10px 0;
+}
+
+.stMarkdown p {
+    margin: 10px 0;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+    background-color: #ffffff;
+    color: #333;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+}
+
+.title {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    color: #0277bd;
+    text-align: center;
+}
+
+.message {
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.message.user {
+    background-color: #bbdefb;
+    color: #0d47a1;
+}
+
+.message.assistant {
+    background-color: #e1f5fe;
+    color: #01579b;
+}
+
+.message:hover {
+    transform: scale(1.02);
+}
+
+.button-group {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.audio-recorder {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.audio-player {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.expander {
+    margin: 20px 0;
+}
+
+.diary-container {
+    background-color: #bbdefb;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.diary-title {
+    font-size: 1.8em;
+    color: #0d47a1;
+    margin-bottom: 10px;
+}
+
+.diary-content {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 15px;
+    color: #333;
+    line-height: 1.6;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+.diary-notice {
+    font-size: 1.2em;
+    color: #01579b;
+    text-align: center;
+    margin-top: 20px;
+}
