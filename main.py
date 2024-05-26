@@ -76,7 +76,7 @@ if 'summary' not in st.session_state:
 if 'diary_generated' not in st.session_state:
     st.session_state.diary_generated = False
 
-st.sidebar.selectbox(
+option = st.sidebar.selectbox(
     '어떤 기능을 이용하시겠습니까?',
     ['일기 작성하기', '일별 일기 모음', '월별 일기 모음', '키워드 중심 정리', '타임라인 확인']
 )
