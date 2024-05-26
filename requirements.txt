@@ -4,5 +4,4 @@ python-dotenv==1.0.1
 numpy
 sounddevice
 scipy 
-json
 audio-recorder-streamlit 
