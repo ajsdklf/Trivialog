@@ -76,12 +76,16 @@ if 'summary' not in st.session_state:
 if 'diary_generated' not in st.session_state:
     st.session_state.diary_generated = False
 
-# Load custom CSS
 with open("styles.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 st.markdown('<div class="container">', unsafe_allow_html=True)
 st.markdown('<div class="title">내 친구 AI</div>', unsafe_allow_html=True)
+
+date = st.date_input('무슨 요일에 대한 기록을 남기고 싶으신가요?')
+
+if st.button('Confirm Date', help='Click to confirm the selected date'):
+    st.session_state.messages.append({'role': 'user', 'content': f"Today's date is {date}"})
 
 chat_container = st.container()
 
@@ -90,12 +94,9 @@ with chat_container:
         role = "user" if message["role"] == "user" else "assistant"
         st.markdown(f'<div class="message {role}"><strong>{role.capitalize()}:</strong> {message["content"]}</div>', unsafe_allow_html=True)
 
-if st.session_state.diary_generated == False:
+if not st.session_state.diary_generated:
     st.markdown('<div class="audio-recorder">', unsafe_allow_html=True)
     audio_bytes = audio_recorder("talk", pause_threshold=2.0)
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    st.markdown('<div class="button-group">', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
     if audio_bytes and not st.session_state.audio_processing:
@@ -113,7 +114,7 @@ if st.session_state.diary_generated == False:
         st.session_state.messages.append({"role": "user", "content": transcript.text})
 
         st.markdown(f'**User:** {transcript.text}')
-        
+
         message_placeholder = st.empty()
         full_response = ""
         for response in client.chat.completions.create(
@@ -140,7 +141,6 @@ if st.session_state.diary_generated == False:
         st.session_state.tts_audio_path = speech_file_path
 
         st.session_state.messages.append({"role": "assistant", "content": full_response})
-        
         st.session_state.input_mode = None
         st.session_state.audio_processing = False
 
@@ -158,41 +158,37 @@ if st.session_state.diary_generated == False:
         st.session_state.tts_audio_path = None
         st.markdown('</div>', unsafe_allow_html=True)
 
-    st.markdown('<div class="button-group">', unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-
-diary_generator = st.button('GENERATE DIARY')
-if diary_generator:
-    summary = client.chat.completions.create(
-        model='gpt-4o',
-        response_format={'type': 'json_object'},
-        messages=[
-            {'role': 'system', 'content': DIARY_WRITING_HELPER},
-            *[{'role': m['role'], 'content': m['content']} for m in st.session_state.messages]
-        ]
-    ).choices[0].message.content    
-    summary_dict = json.loads(summary)
-    
-    enough_boolean = summary_dict['is_enough']
-    summarization = summary_dict['summarization']
-    summarization = json.dumps(summarization)
-    
-    if enough_boolean == 'True':
-        diary = client.chat.completions.create(
+if st.button('Generate Diary', help='Click to generate a diary entry from the conversation'):
+    with st.spinner("Generating Diary..."):
+        summary = client.chat.completions.create(
             model='gpt-4o',
+            response_format={'type': 'json_object'},
             messages=[
-                {'role': 'system', 'content': DIARY_WRITER},
-                {'role': 'user', 'content': summarization}
+                {'role': 'system', 'content': DIARY_WRITING_HELPER},
+                *[{'role': m['role'], 'content': m['content']} for m in st.session_state.messages]
             ]
         ).choices[0].message.content
-        
-        st.markdown('<div class="diary-container">', unsafe_allow_html=True)
-        st.markdown('<div class="diary-title">생성된 일기</div>', unsafe_allow_html=True)
-        st.markdown(f'<div class="diary-content">{diary}</div>', unsafe_allow_html=True)
-        st.markdown('<div class="diary-notice">일기가 생성됐어요! 😊</div>', unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-    
-    if enough_boolean == 'False':
-        st.markdown('<div class="diary-notice">아직 정보가 충분하지 않아요!! 조금만 더 대화를 해봐요!</div>', unsafe_allow_html=True)
+        summary_dict = json.loads(summary)
+
+        enough_boolean = summary_dict['is_enough']
+        summarization = summary_dict['summarization']
+        summarization = json.dumps(summarization)
+
+        if enough_boolean == 'True':
+            diary = client.chat.completions.create(
+                model='gpt-4o',
+                messages=[
+                    {'role': 'system', 'content': DIARY_WRITER},
+                    {'role': 'user', 'content': summarization}
+                ]
+            ).choices[0].message.content
+
+            st.markdown('<div class="diary-container">', unsafe_allow_html=True)
+            st.markdown('<div class="diary-title">생성된 일기</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="diary-content">{diary}</div>', unsafe_allow_html=True)
+            st.markdown('<div class="diary-notice">일기가 생성됐어요! 😊</div>', unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
+        else:
+            st.markdown('<div class="diary-notice">아직 정보가 충분하지 않아요!! 조금만 더 대화를 해봐요!</div>', unsafe_allow_html=True)
 
 st.markdown('</div>', unsafe_allow_html=True)
