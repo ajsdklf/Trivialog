@@ -133,7 +133,7 @@ if st.session_state.diary_generated == False:
         speech_file_path = "tmp_speak.mp3"
         response = client.audio.speech.create(
             model="tts-1-hd",
-            voice="alloy",
+            voice="shimmer",
             input=full_response,
             speed=1.2
         )
