@@ -98,7 +98,7 @@ if st.session_state.diary_generated == False:
     st.markdown('<div class="button-group">', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
-    if audio_bytes and audio_submitter and not st.session_state.audio_processing:
+    if audio_bytes and not st.session_state.audio_processing:
         st.session_state.audio_processing = True
         with open("./tmp_audio.wav", "wb") as f:
             f.write(audio_bytes)
