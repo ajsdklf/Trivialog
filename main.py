@@ -98,8 +98,9 @@ if not st.session_state.diary_generated:
     st.markdown('<div class="audio-recorder">', unsafe_allow_html=True)
     audio_bytes = audio_recorder("talk", pause_threshold=2.0)
     st.markdown('</div>', unsafe_allow_html=True)
-
-    if audio_bytes and not st.session_state.audio_processing:
+    
+    audio_submitter = st.button('Submit audio')
+    if audio_bytes and audio_submitter and not st.session_state.audio_processing:
         st.session_state.audio_processing = True
         with open("./tmp_audio.wav", "wb") as f:
             f.write(audio_bytes)
