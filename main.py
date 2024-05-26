@@ -160,7 +160,6 @@ if st.session_state.diary_generated == False:
         st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="button-group">', unsafe_allow_html=True)
-    st.button('Click to start conversation')
     st.markdown('</div>', unsafe_allow_html=True)
 
 diary_generator = st.button('GENERATE DIARY')
