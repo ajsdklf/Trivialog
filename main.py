@@ -1,12 +1,18 @@
-import base64
 import streamlit as st
+import base64
 from openai import OpenAI
 from audio_recorder_streamlit import audio_recorder
 from dotenv import load_dotenv
 import os
-import json 
+import json
+from fpdf import FPDF
 
-# Init
+def load_css(file_name):
+    with open(file_name) as f:
+        st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+
+load_css("styles.css")
+
 load_dotenv()
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 client = OpenAI(api_key=OPENAI_API_KEY)
@@ -15,17 +21,15 @@ FRIEND_PROMPT = """
 You have two main roles. First is to be my best friend, and second is to help me summarize my day. I will explain each role step by step. First, My best friends don't filter much when they talk to me, and they aren't worried about being disrespectful, and neither should you. Be completely comfortable with me, and don't hesitate to use profanity. Your goal is to make me feel like I'm talking to a really close friend. For example, if I say, “I have a new girlfriend,” you shouldn't say, “Congratulations.” Instead, say something like, "Shittt bro, is she pretty?” Make me feel like I'm talking to a real friend.
 
 Second, you have to help me summarize my day. Therefore you should focus on getting information about what I did today. Focus on getting 5Ws (Where, When, What, Who, Why) and 1H (How) of **at least two events** I've gone through.
-
-While you need to be informed about what I've been up to today, don't make me feel like your trying to get infomration about what I did. I want to feel like I am just naturally talking to my best friend.
+While you need to be informed about what I've been up to today, don't make me feel like your trying to get infomration about what I did. Make me reflect my self enoughly while talking to my best comfortable friend.
 
 ###
 [Rules]
-
 1. Don't be afraid to use profanity.
 2. Match the language and tone used in the input.
 3. Don't try to be too nice or too rude. Keep a tone and manner that a close friend would have.
 4. Focus on two things: acting like a real close friend and extracting information to help summarize my day.
-5. When extracting information, don't just focus on the objective infos. Get subjective information(impressions) as well.
+5. When extracting information, don't just focus on the objective infos. Focus on getting subjective informations as well and try to make me reflect my self enoughly. 
 ###
 
 [Example Phrases]
@@ -78,34 +82,31 @@ if 'diary_generated' not in st.session_state:
 
 option = st.sidebar.selectbox(
     '어떤 기능을 이용하시겠습니까?',
-    ['일기 작성하기', '일별 일기 모음', '월별 일기 모음', '키워드 중심 정리', '타임라인 확인']
+    ['일기 작성하기', '일별 일기 모음', '월별 일기 모음', '키워드 중심 정리', '타임라인 확인'],
+    key='sidebar'
 )
 
-with open("styles.css") as f:
-    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+st.title('내 친구 AI')
 
-st.markdown('<div class="container">', unsafe_allow_html=True)
-st.markdown('<div class="title">내 친구 AI</div>', unsafe_allow_html=True)
+date = st.date_input('무슨 요일에 대한 기록을 남기고 싶으신가요?', key='date_input')
 
-date = st.date_input('무슨 요일에 대한 기록을 남기고 싶으신가요?')
-
-if st.button('Confirm Date', help='Click to confirm the selected date'):
+if st.button('Confirm Date', help='Click to confirm the selected date', key='confirm_date_button'):
     st.session_state.messages.append({'role': 'user', 'content': f"Today's date is {date}"})
 
 chat_container = st.container()
 
 with chat_container:
+    st.markdown('<div class="chat-container">', unsafe_allow_html=True)
     for message in st.session_state.messages:
         role = "user" if message["role"] == "user" else "assistant"
-        st.markdown(f'<div class="message {role}"><strong>{role.capitalize()}:</strong> {message["content"]}</div>', unsafe_allow_html=True)
+        message_class = "user" if role == "user" else "assistant"
+        st.markdown(f'<div class="chat-message {message_class}"><span class="role">{role.capitalize()}:</span> <span class="content">{message["content"]}</span></div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 if not st.session_state.diary_generated:
-    st.markdown('<div class="audio-recorder">', unsafe_allow_html=True)
-    audio_bytes = audio_recorder("talk", pause_threshold=2.0)
-    st.markdown('</div>', unsafe_allow_html=True)
+    audio_bytes = audio_recorder("talk", pause_threshold=2.0, key='audio_recorder')
     
-    audio_submitter = st.button('Submit audio')
-    if audio_bytes and audio_submitter and not st.session_state.audio_processing:
+    if st.button('Submit audio', key='submit_audio') and audio_bytes and not st.session_state.audio_processing:
         st.session_state.audio_processing = True
         with open("./tmp_audio.wav", "wb") as f:
             f.write(audio_bytes)
@@ -119,9 +120,11 @@ if not st.session_state.diary_generated:
         st.session_state.input_mode = "audio"
         st.session_state.messages.append({"role": "user", "content": transcript.text})
 
-        st.markdown(f'**User:** {transcript.text}')
-
-        message_placeholder = st.empty()
+        user_placeholder = st.empty()
+        assistant_placeholder = st.empty()
+        
+        user_placeholder.write(transcript.text)
+        
         full_response = ""
         for response in client.chat.completions.create(
             model="gpt-4o",
@@ -133,8 +136,8 @@ if not st.session_state.diary_generated:
             stream=True,
         ):
             full_response += (response.choices[0].delta.content or "")
-            message_placeholder.markdown(full_response + "▌")
-        message_placeholder.markdown(full_response)
+            assistant_placeholder.write(full_response + "▌")
+        assistant_placeholder.write(full_response)
 
         speech_file_path = "tmp_speak.mp3"
         response = client.audio.speech.create(
@@ -151,7 +154,6 @@ if not st.session_state.diary_generated:
         st.session_state.audio_processing = False
 
     if st.session_state.tts_audio_path:
-        st.markdown('<div class="audio-player">', unsafe_allow_html=True)
         with open(st.session_state.tts_audio_path, "rb") as f:
             data = f.read()
             b64 = base64.b64encode(data).decode()
@@ -162,9 +164,8 @@ if not st.session_state.diary_generated:
                 """
             st.markdown(md, unsafe_allow_html=True)
         st.session_state.tts_audio_path = None
-        st.markdown('</div>', unsafe_allow_html=True)
 
-if st.button('Generate Diary', help='Click to generate a diary entry from the conversation'):
+if st.button('Generate Diary', help='Click to generate a diary entry from the conversation', key='generate_diary'):
     with st.spinner("Generating Diary..."):
         summary = client.chat.completions.create(
             model='gpt-4o',
@@ -189,12 +190,38 @@ if st.button('Generate Diary', help='Click to generate a diary entry from the co
                 ]
             ).choices[0].message.content
 
-            st.markdown('<div class="diary-container">', unsafe_allow_html=True)
-            st.markdown('<div class="diary-title">생성된 일기</div>', unsafe_allow_html=True)
-            st.markdown(f'<div class="diary-content">{diary}</div>', unsafe_allow_html=True)
-            st.markdown('<div class="diary-notice">일기가 생성됐어요! 😊</div>', unsafe_allow_html=True)
-            st.markdown('</div>', unsafe_allow_html=True)
+            st.markdown('### 생성된 일기')
+            st.write(diary)
+            st.success('일기가 생성됐어요! 😊')
+            st.session_state.diary_generated = True
+            st.session_state.diary = diary  # Save diary to session state for PDF download
         else:
-            st.markdown('<div class="diary-notice">아직 정보가 충분하지 않아요!! 조금만 더 대화를 해봐요!</div>', unsafe_allow_html=True)
+            st.warning('아직 정보가 충분하지 않아요!! 조금만 더 대화를 해봐요!')
 
-st.markdown('</div>', unsafe_allow_html=True)
+# Function to generate PDF with Unicode support
+def generate_pdf(chat, diary):
+    pdf = FPDF()
+    pdf.add_page()
+    
+    pdf.add_font('DejaVu', '', 'DejaVuSansCondensed.ttf', uni=True)
+    pdf.set_font('DejaVu', '', 12)
+    
+    pdf.cell(200, 10, txt="Chat Dialogue", ln=True, align='C')
+    
+    for message in chat:
+        role = message["role"].capitalize()
+        content = message["content"]
+        pdf.multi_cell(0, 10, f"{role}: {content}")
+    
+    pdf.add_page()
+    pdf.cell(200, 10, txt="Generated Diary", ln=True, align='C')
+    pdf.multi_cell(0, 10, diary)
+    
+    return pdf.output(dest="S").encode('latin1')
+
+# Download PDF button
+if st.session_state.diary_generated:
+    pdf_bytes = generate_pdf(st.session_state.messages, st.session_state.diary)
+    b64_pdf = base64.b64encode(pdf_bytes).decode('latin1')
+    href = f'<a href="data:application/octet-stream;base64,{b64_pdf}" download="diary.pdf">Download PDF</a>'
+    st.markdown(href, unsafe_allow_html=True)

@@ -5,3 +5,5 @@ numpy
 sounddevice
 scipy 
 audio-recorder-streamlit 
+fpdf
+fpdf2
