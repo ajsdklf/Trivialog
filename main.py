@@ -225,9 +225,25 @@ def generate_pdf(chat, diary):
     
     return pdf.output(dest="S").encode('latin1')
 
+# Function to generate text file
+def generate_txt(chat, diary):
+    chat_text = "\n".join([f"{message['role'].capitalize()}: {message['content']}" for message in chat])
+    diary_text = f"Generated Diary\n\n{diary}"
+    return chat_text, diary_text
+
 # Download PDF button
 if st.session_state.diary_generated:
     pdf_bytes = generate_pdf(st.session_state.messages, st.session_state.diary)
     b64_pdf = base64.b64encode(pdf_bytes).decode('latin1')
     href = f'<a href="data:application/octet-stream;base64,{b64_pdf}" download="diary.pdf">Download PDF</a>'
     st.markdown(href, unsafe_allow_html=True)
+    
+    chat_text, diary_text = generate_txt(st.session_state.messages, st.session_state.diary)
+    b64_chat = base64.b64encode(chat_text.encode()).decode()
+    b64_diary = base64.b64encode(diary_text.encode()).decode()
+    
+    href_chat = f'<a href="data:text/plain;base64,{b64_chat}" download="chat.txt">Download Chat TXT</a>'
+    href_diary = f'<a href="data:text/plain;base64,{b64_diary}" download="diary.txt">Download Diary TXT</a>'
+    
+    st.markdown(href_chat, unsafe_allow_html=True)
+    st.markdown(href_diary, unsafe_allow_html=True)
