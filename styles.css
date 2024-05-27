@@ -11,6 +11,7 @@ body {
     background-color: #ffffff;
     padding: 20px;
     border-right: 1px solid #ddd;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
 }
 
 .sidebar .sidebar-content .element-container {
@@ -18,60 +19,61 @@ body {
 }
 
 h1 {
-    color: #3945cd;
-    font-size: 2em;
+    color: #5a65dc;
+    font-size: 2.5em;
     text-align: center;
     margin-top: 20px;
 }
 
 .chat-container {
-    background-color: #b7bbf1;
+    background-color: #f6e6e6;
     border-radius: 10px;
     padding: 20px;
     max-width: 800px;
     margin: 20px auto;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    max-height: 70vh;
 }
 
 .chat-message {
-    background-color: #638ef3;
+    background-color: #f1f3fa;
     border-radius: 8px;
-    padding: 10px;
-    margin-bottom: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    margin-bottom: 15px;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     transition: background-color 0.3s ease;
-    color: #333; /* Make text darker */
+    color: #333;
+}
+
+.chat-message.user {
+    background-color: #d1ffd1;
+    align-self: flex-end;
+}
+
+.chat-message.assistant {
+    background-color: #e1e7fd;
+    align-self: flex-start;
 }
 
 .chat-message:hover {
     background-color: #e9e9e9;
 }
 
-.chat-message.user {
-    background-color: #a9e9cc;
-    align-self: flex-end;
-}
-
-.chat-message.assistant {
-    background-color: #9eb6e8;
-    align-self: flex-start;
-}
-
 .chat-message .role {
     font-weight: bold;
     margin-right: 10px;
-    color: #333; /* Make text darker */
+    color: #333;
 }
 
-.chat-message .content {
+chat-message .content {
     flex-grow: 1;
-    color: #1a1a48; /* Make text darker */
+    color: #1a1a48;
 }
 
 .stButton button {
-    background-color: #007bff;
+    background-color: #4c75d4;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -81,16 +83,14 @@ h1 {
 }
 
 .stButton button:hover {
-    background-color: #0056b3;
-}
-
-.audio-recorder {
-    margin: 20px 0;
+    background-color: #2a34a3;
 }
 
 audio {
     width: 100%;
     margin-top: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .spinner-container {
@@ -98,4 +98,81 @@ audio {
     justify-content: center;
     align-items: center;
     height: 100vh;
+}
+
+/* Additional styles for better UX */
+.sidebar .sidebar-content .element-container label {
+    font-weight: bold;
+    color: #3945cd;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.chat-container::-webkit-scrollbar {
+    width: 10px;
+}
+
+.chat-container::-webkit-scrollbar-thumb {
+    background-color: #3945cd;
+    border-radius: 10px;
+}
+
+.chat-container::-webkit-scrollbar-track {
+    background-color: #f0f2f6;
+    border-radius: 10px;
+}
+
+.stDateInput label, .stDateInput input {
+    color: #b3b6d7;
+    font-weight: bold;
+}
+
+.audio-recorder button {
+    background-color: #3945cd;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.audio-recorder button:hover {
+    background-color: #2a34a3;
+}
+
+.stAudio input {
+    display: none;
+}
+
+.stAudio label {
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding: 10px;
+    background-color: #3945cd;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.stAudio label:hover {
+    background-color: #2a34a3;
+}
+
+.alert-success, .alert-warning {
+    border-radius: 5px;
+    padding: 15px;
+    color: white;
+    margin: 20px auto;
+    max-width: 800px;
+}
+
+.alert-success {
+    background-color: #28a745;
+}
+
+.alert-warning {
+    background-color: #ffc107;
 }
