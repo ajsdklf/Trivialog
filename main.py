@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 import os
 import json
 from fpdf import FPDF
+from datetime import datetime
 
 def load_css(file_name):
     with open(file_name) as f:
@@ -96,6 +97,7 @@ option = st.sidebar.selectbox(
 st.title('내 친구 AI')
 
 date = st.date_input('무슨 요일에 대한 기록을 남기고 싶으신가요?', key='date_input')
+date_str = date.strftime("%Y-%m-%d")
 
 if st.button('Confirm Date', help='Click to confirm the selected date', key='confirm_date_button'):
     st.session_state.messages.append({'role': 'user', 'content': f"Today's date is {date}"})
@@ -236,15 +238,15 @@ def generate_txt(chat, diary):
 if st.session_state.diary_generated:
     pdf_bytes = generate_pdf(st.session_state.messages, st.session_state.diary)
     b64_pdf = base64.b64encode(pdf_bytes).decode('latin1')
-    href = f'<a href="data:application/octet-stream;base64,{b64_pdf}" download="diary.pdf">Download PDF</a>'
+    href = f'<a href="data:application/octet-stream;base64,{b64_pdf}" download="diary_{date_str}.pdf">Download PDF</a>'
     st.markdown(href, unsafe_allow_html=True)
     
     chat_text, diary_text = generate_txt(st.session_state.messages, st.session_state.diary)
     b64_chat = base64.b64encode(chat_text.encode()).decode()
     b64_diary = base64.b64encode(diary_text.encode()).decode()
     
-    href_chat = f'<a href="data:text/plain;base64,{b64_chat}" download="chat{date}.txt">Download Chat TXT</a>'
-    href_diary = f'<a href="data:text/plain;base64,{b64_diary}" download=f"diary{date}.txt">Download Diary TXT</a>'
+    href_chat = f'<a href="data:text/plain;base64,{b64_chat}" download="chat_{date_str}.txt">Download Chat TXT</a>'
+    href_diary = f'<a href="data:text/plain;base64,{b64_diary}" download="diary_{date_str}.txt">Download Diary TXT</a>'
     
     st.markdown(href_chat, unsafe_allow_html=True)
     st.markdown(href_diary, unsafe_allow_html=True)
