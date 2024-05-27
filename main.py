@@ -210,7 +210,9 @@ def generate_pdf(chat, diary):
     pdf = FPDF()
     pdf.add_page()
     
-    pdf.add_font('DejaVu', '', 'DejaVuSansCondensed.ttf', uni=True)
+    # 폰트 파일 경로를 지정합니다.
+    font_path = os.path.join(os.path.dirname(__file__), 'fonts', 'DejaVuSansCondensed.ttf')
+    pdf.add_font('DejaVu', '', font_path, uni=True)
     pdf.set_font('DejaVu', '', 12)
     
     pdf.cell(200, 10, txt="Chat Dialogue", ln=True, align='C')
@@ -241,8 +243,8 @@ if st.session_state.diary_generated:
     b64_chat = base64.b64encode(chat_text.encode()).decode()
     b64_diary = base64.b64encode(diary_text.encode()).decode()
     
-    href_chat = f'<a href="data:text/plain;base64,{b64_chat}" download="chat.txt">Download Chat TXT</a>'
-    href_diary = f'<a href="data:text/plain;base64,{b64_diary}" download="diary.txt">Download Diary TXT</a>'
+    href_chat = f'<a href="data:text/plain;base64,{b64_chat}" download="chat{date}.txt">Download Chat TXT</a>'
+    href_diary = f'<a href="data:text/plain;base64,{b64_diary}" download=f"diary{date}.txt">Download Diary TXT</a>'
     
     st.markdown(href_chat, unsafe_allow_html=True)
     st.markdown(href_diary, unsafe_allow_html=True)
