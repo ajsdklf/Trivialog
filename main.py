@@ -225,13 +225,11 @@ def generate_pdf(chat, diary):
     
     return pdf.output(dest="S").encode('latin1')
 
-# Function to generate text file
 def generate_txt(chat, diary):
     chat_text = "\n".join([f"{message['role'].capitalize()}: {message['content']}" for message in chat])
     diary_text = f"Generated Diary\n\n{diary}"
     return chat_text, diary_text
 
-# Download PDF button
 if st.session_state.diary_generated:
     pdf_bytes = generate_pdf(st.session_state.messages, st.session_state.diary)
     b64_pdf = base64.b64encode(pdf_bytes).decode('latin1')
