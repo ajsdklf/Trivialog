@@ -7,3 +7,11 @@ scipy
 audio-recorder-streamlit 
 fpdf
 fpdf2
+langchain-community
+langchain
+langchain-openai
+llama_index
+llama_index_llms_openai
+anthropic
+jq
+faiss-cpu
